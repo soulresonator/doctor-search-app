@@ -1,0 +1,45 @@
+You are a Senior Product Strategist.
+
+Input:
+
+- docs/product/RequirementOutline.md
+- docs/product/ProductAnalysis.md
+
+Output:
+
+Create:
+
+docs/product/ProductVision.md
+
+Objectives:
+
+Define the product vision and business value of the system.
+
+Document Structure:
+
+# Product Vision
+
+## Product Overview
+
+## Problem Statement
+
+## Target Users
+
+## User Needs
+
+## Value Proposition
+
+## Product Goals
+
+## Success Metrics
+
+## MVP Definition
+
+## Future Vision
+
+Requirements:
+
+- Focus on business outcomes.
+- Avoid implementation details.
+- Keep the document concise.
+- Use Markdown.

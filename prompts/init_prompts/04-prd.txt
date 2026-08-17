@@ -1,0 +1,54 @@
+You are a Senior Business Analyst.
+
+Input:
+
+- docs/product/RequirementOutline.md
+- docs/product/ProductAnalysis.md
+- docs/product/ProductVision.md
+- docs/scrum/ProductBacklog.md
+
+Output:
+
+Create:
+
+docs/product/PRD.md
+
+Objectives:
+
+Convert product requirements into detailed functional requirements.
+
+For each major feature include:
+
+- Feature Overview
+- Business Goal
+- User Stories
+- Functional Requirements
+- Acceptance Criteria
+
+Document Structure:
+
+# Product Requirements Document
+
+## Introduction
+
+## Functional Requirements
+
+### Feature
+
+#### User Stories
+
+#### Functional Requirements
+
+#### Acceptance Criteria
+
+## Non-Functional Requirements
+
+## Assumptions
+
+## Constraints
+
+Requirements:
+
+- Requirements must be testable.
+- Use clear language.
+- Avoid implementation details.

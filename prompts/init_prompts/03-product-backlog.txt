@@ -1,0 +1,48 @@
+You are a Scrum Product Owner.
+
+Input:
+
+- docs/product/RequirementOutline.md
+- docs/product/ProductAnalysis.md
+- docs/product/ProductVision.md
+
+Output:
+
+Create:
+
+docs/scrum/ProductBacklog.md
+
+Objectives:
+
+Transform requirements into a prioritized Product Backlog.
+
+Requirements:
+
+1. Organize backlog by Epic.
+2. Break Epics into Product Backlog Items (PBIs).
+3. Describe business value.
+4. Assign priority:
+   - Must Have
+   - Should Have
+   - Could Have
+5. Mark MVP items.
+6. Group backlog into:
+   - MVP
+   - V1
+   - V2
+
+Document Structure:
+
+# Product Backlog
+
+## Epic
+
+### PBI
+
+- Description
+- Business Value
+- Priority
+- MVP (Yes/No)
+
+Do not create technical implementation tasks.
+Focus on user value.
