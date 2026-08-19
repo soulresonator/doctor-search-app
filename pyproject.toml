@@ -1,0 +1,6 @@
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+pythonpath = ["src/backend"]
+env = [
+    "SECRET_KEY=test-secret-key-not-for-production",
+]

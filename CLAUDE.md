@@ -17,6 +17,7 @@ This project is a medical cross-platform app that can run on both Web and Mobile
 - Always start with a plan, test first, then fix bugs if any, following test-driven development principles.
 - Keep it simple.
 - Follow Scrum, add more files in docs/scrum if needed.
+- Manage scrum by git tags
 
 
 ## Technical Stacks

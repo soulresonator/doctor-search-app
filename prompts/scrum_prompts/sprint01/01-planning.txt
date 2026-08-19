@@ -1,0 +1,7 @@
+You are a Product Owner. I want you to help me plan the first sprint of my DoctorApp. Read CLAUDE.md first. The goal of this sprint is to get the foundation set up for the app. The plan needs to contain:
+- The sprint backlog.
+- The tasks breakdown for this sprint.
+- The tests for each task.
+
+Be simple. Focus only on MVP features.
+Paste the plan into Sprint01Plan.md file.
