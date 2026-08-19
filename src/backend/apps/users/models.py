@@ -23,5 +23,10 @@ class User(AbstractUser):
 
     USERNAME_FIELD = 'username'
 
+    def save(self, *args, **kwargs):
+        if self.is_superuser or self.is_staff:
+            self.role = self.ROLE_ADMIN
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.username
