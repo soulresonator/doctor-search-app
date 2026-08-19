@@ -1,5 +1,6 @@
 import uuid
 
+from django.conf import settings
 from django.db import models
 
 
@@ -44,6 +45,14 @@ class ClinicAddress(models.Model):
 
 class Doctor(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # Linked user account — set when a doctor registers/is invited
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='doctor_profile',
+    )
     full_name = models.CharField(max_length=255, db_index=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
@@ -61,3 +70,33 @@ class Doctor(models.Model):
 
     def __str__(self):
         return self.full_name
+
+
+class Appointment(models.Model):
+    STATUS_PENDING = 'pending'
+    STATUS_CONFIRMED = 'confirmed'
+    STATUS_CANCELLED = 'cancelled'
+    STATUS_CHOICES = [
+        (STATUS_PENDING, 'Pending'),
+        (STATUS_CONFIRMED, 'Confirmed'),
+        (STATUS_CANCELLED, 'Cancelled'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    patient = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='appointments',
+    )
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name='appointments')
+    scheduled_at = models.DateTimeField(db_index=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING, db_index=True)
+    note = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['scheduled_at']
+
+    def __str__(self):
+        return f'{self.patient} → {self.doctor} @ {self.scheduled_at:%Y-%m-%d %H:%M}'

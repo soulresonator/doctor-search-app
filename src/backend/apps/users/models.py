@@ -7,7 +7,12 @@ from django.db import models
 class User(AbstractUser):
     ROLE_USER = 'user'
     ROLE_ADMIN = 'admin'
-    ROLE_CHOICES = [(ROLE_USER, 'User'), (ROLE_ADMIN, 'Admin')]
+    ROLE_DOCTOR = 'doctor'
+    ROLE_CHOICES = [
+        (ROLE_USER, 'User'),
+        (ROLE_ADMIN, 'Admin'),
+        (ROLE_DOCTOR, 'Doctor'),
+    ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     full_name = models.CharField(max_length=255, blank=True, default='')
@@ -24,7 +29,8 @@ class User(AbstractUser):
     USERNAME_FIELD = 'username'
 
     def save(self, *args, **kwargs):
-        if self.is_superuser or self.is_staff:
+        # Superusers/staff get admin role unless already flagged as doctor
+        if (self.is_superuser or self.is_staff) and self.role != self.ROLE_DOCTOR:
             self.role = self.ROLE_ADMIN
         super().save(*args, **kwargs)
 

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Specialty, Hospital, ClinicAddress, Doctor
+from .models import Appointment, ClinicAddress, Doctor, Hospital, Specialty
 
 
 @admin.register(Specialty)
@@ -28,3 +28,10 @@ class DoctorAdmin(admin.ModelAdmin):
     list_filter = ('specialty', 'hospital', 'gender', 'is_active')
     search_fields = ('full_name',)
     list_editable = ('is_active',)
+
+
+@admin.register(Appointment)
+class AppointmentAdmin(admin.ModelAdmin):
+    list_display = ('patient', 'doctor', 'scheduled_at', 'status', 'created_at')
+    list_filter = ('status',)
+    search_fields = ('patient__username', 'doctor__full_name')
