@@ -42,7 +42,7 @@ def test_doctor_list_requires_auth():
 def test_doctor_list_returns_active_only(auth_client, db_data):
     resp = auth_client.get(reverse('doctor-list'))
     assert resp.status_code == 200
-    names = [d['full_name'] for d in resp.data]
+    names = [d['full_name'] for d in resp.data['results']]
     assert 'Dr. Alice' in names
     assert 'Dr. Bob' in names
     assert 'Dr. Carol' not in names  # inactive
@@ -52,36 +52,58 @@ def test_doctor_list_returns_active_only(auth_client, db_data):
 def test_doctor_filter_by_specialty(auth_client, db_data):
     resp = auth_client.get(reverse('doctor-list'), {'specialty': 'Cardiology'})
     assert resp.status_code == 200
-    assert all('Cardiology' in d['specialty']['name'] for d in resp.data)
+    assert all('Cardiology' in d['specialty']['name'] for d in resp.data['results'])
 
 
 @pytest.mark.django_db
 def test_doctor_filter_by_location(auth_client, db_data):
     resp = auth_client.get(reverse('doctor-list'), {'location': 'Hanoi'})
     assert resp.status_code == 200
-    assert all('Hanoi' in d['hospital']['location'] for d in resp.data)
+    assert all('Hanoi' in d['hospital']['location'] for d in resp.data['results'])
 
 
 @pytest.mark.django_db
 def test_doctor_filter_by_gender(auth_client, db_data):
     resp = auth_client.get(reverse('doctor-list'), {'gender': 'Male'})
     assert resp.status_code == 200
-    assert all(d['gender'] == 'Male' for d in resp.data)
+    assert all(d['gender'] == 'Male' for d in resp.data['results'])
 
 
 @pytest.mark.django_db
 def test_doctor_search_by_name(auth_client, db_data):
     resp = auth_client.get(reverse('doctor-list'), {'search': 'Alice'})
     assert resp.status_code == 200
-    assert len(resp.data) == 1
-    assert resp.data[0]['full_name'] == 'Dr. Alice'
+    assert len(resp.data['results']) == 1
+    assert resp.data['results'][0]['full_name'] == 'Dr. Alice'
 
 
 @pytest.mark.django_db
 def test_doctor_empty_results(auth_client, db_data):
     resp = auth_client.get(reverse('doctor-list'), {'specialty': 'Dermatology'})
     assert resp.status_code == 200
-    assert len(resp.data) == 0
+    assert len(resp.data['results']) == 0
+
+
+@pytest.mark.django_db
+def test_doctor_list_is_paginated(auth_client, db_data):
+    resp = auth_client.get(reverse('doctor-list'))
+    assert resp.status_code == 200
+    assert 'count' in resp.data
+    assert 'next' in resp.data
+    assert 'previous' in resp.data
+    assert 'results' in resp.data
+
+
+@pytest.mark.django_db
+def test_doctor_options(auth_client, db_data):
+    resp = auth_client.get(reverse('doctor-options'))
+    assert resp.status_code == 200
+    assert 'specialties' in resp.data
+    assert 'locations' in resp.data
+    assert 'Cardiology' in resp.data['specialties']
+    assert 'Neurology' in resp.data['specialties']
+    assert 'Hanoi' in resp.data['locations']
+    assert 'HCMC' in resp.data['locations']
 
 
 # ── Doctor detail ─────────────────────────────────────────────────────────────

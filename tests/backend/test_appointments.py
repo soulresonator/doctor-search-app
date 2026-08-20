@@ -100,7 +100,7 @@ def test_patient_sees_own_appointments(patient_client, patient, doctor_profile):
     Appointment.objects.create(patient=patient, doctor=doctor_profile, scheduled_at='2030-01-15T10:00:00Z')
     resp = patient_client.get(reverse('appointment-list'))
     assert resp.status_code == 200
-    assert len(resp.data) == 1
+    assert len(resp.data['results']) == 1
 
 
 # ── Appointments: doctor manages ─────────────────────────────────────────────
@@ -110,7 +110,7 @@ def test_doctor_sees_their_appointments(doctor_client, doctor_profile, patient):
     Appointment.objects.create(patient=patient, doctor=doctor_profile, scheduled_at='2030-01-15T10:00:00Z')
     resp = doctor_client.get(reverse('appointment-list'))
     assert resp.status_code == 200
-    assert len(resp.data) == 1
+    assert len(resp.data['results']) == 1
 
 
 @pytest.mark.django_db
@@ -142,17 +142,28 @@ def test_doctor_cannot_set_invalid_status(doctor_client, doctor_profile, patient
         reverse('appointment-status', kwargs={'pk': appt.pk}),
         {'status': 'approved'}, format='json',
     )
-    assert resp.status_code == 400
+    assert resp.status_code == 403
 
 
 @pytest.mark.django_db
-def test_patient_cannot_update_appointment_status(patient_client, doctor_profile, patient):
+def test_patient_can_cancel_own_appointment(patient_client, doctor_profile, patient):
+    appt = Appointment.objects.create(patient=patient, doctor=doctor_profile, scheduled_at='2030-01-15T10:00:00Z')
+    resp = patient_client.patch(
+        reverse('appointment-status', kwargs={'pk': appt.pk}),
+        {'status': 'cancelled'}, format='json',
+    )
+    assert resp.status_code == 200
+    assert resp.data['status'] == 'cancelled'
+
+
+@pytest.mark.django_db
+def test_patient_cannot_confirm_appointment(patient_client, doctor_profile, patient):
     appt = Appointment.objects.create(patient=patient, doctor=doctor_profile, scheduled_at='2030-01-15T10:00:00Z')
     resp = patient_client.patch(
         reverse('appointment-status', kwargs={'pk': appt.pk}),
         {'status': 'confirmed'}, format='json',
     )
-    assert resp.status_code == 404  # get_queryset returns none for non-doctors
+    assert resp.status_code == 403  # or 400 depending on how we implement it
 
 
 @pytest.mark.django_db

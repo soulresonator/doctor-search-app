@@ -56,6 +56,7 @@ class Doctor(models.Model):
     full_name = models.CharField(max_length=255, db_index=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
+    image = models.ImageField(upload_to='doctors/', null=True, blank=True)
     age = models.PositiveIntegerField(blank=True, null=True)
     gender = models.CharField(max_length=50, blank=True, null=True)
     years_of_experience = models.PositiveIntegerField(blank=True, null=True)

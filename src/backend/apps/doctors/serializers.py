@@ -23,7 +23,7 @@ class DoctorSerializer(serializers.ModelSerializer):
         model = Doctor
         fields = (
             'id', 'full_name', 'gender', 'years_of_experience',
-            'specialty', 'hospital', 'phone_number', 'email', 'is_active',
+            'specialty', 'hospital', 'phone_number', 'email', 'image', 'is_active',
         )
 
 
