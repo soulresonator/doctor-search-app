@@ -14,6 +14,8 @@ def print_menu():
     print("5. Run Development Server")
     print("6. Run Tests")
     print("7. Run Tests (verbose)")
+    print("8. Reset Database (Drop all and migrate)")
+    print("9. Reset Database and Seed Mock Data")
     print("0. Exit")
     print("="*40)
 
@@ -77,6 +79,38 @@ print(f"\\n✅ Doctor entity ready!")
             run_command("pytest")
         elif choice == "7":
             run_command("pytest -v")
+        elif choice == "8":
+            print("\nResetting Database...")
+            if os.path.exists("db.sqlite3"):
+                os.remove("db.sqlite3")
+            run_command("python manage.py migrate")
+        elif choice == "9":
+            print("\nResetting Database and Seeding Mock Data...")
+            if os.path.exists("db.sqlite3"):
+                os.remove("db.sqlite3")
+            run_command("python manage.py migrate")
+            
+            script = """
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+django.setup()
+
+from apps.users.models import User
+from apps.doctors.models import Doctor, Specialty, Hospital
+
+specialty, _ = Specialty.objects.get_or_create(name='Neurology', defaults={'description':'Brain specialist'})
+hospital, _ = Hospital.objects.get_or_create(name='City Hospital', defaults={'location':'San Francisco'})
+
+Doctor.objects.create(full_name='Dr. John Doe', specialty=specialty, hospital=hospital, years_of_experience=10)
+Doctor.objects.create(full_name='Dr. Alice Wonderland', specialty=specialty, hospital=hospital, years_of_experience=5)
+
+print(f"\\n✅ Mock Data Seeded!")
+"""
+            with open('.seed.py', 'w') as f:
+                f.write(script.strip())
+            run_command("python .seed.py")
+            os.remove('.seed.py')
         elif choice == "0":
             print("\nGoodbye! 👋")
             break

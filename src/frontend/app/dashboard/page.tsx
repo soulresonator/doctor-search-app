@@ -309,10 +309,21 @@ export default function DashboardPage() {
                   type="date"
                   required
                   min={new Date().toISOString().split('T')[0]}
+                  max={new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0]}
                   value={bookingModal.date}
                   onChange={e => setBookingModal({ ...bookingModal, date: e.target.value })}
                   className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+                <div className="mt-2 flex gap-2">
+                  <button type="button" onClick={() => {
+                    const d = new Date(); d.setDate(d.getDate() + 1);
+                    setBookingModal({ ...bookingModal, date: d.toISOString().split('T')[0] })
+                  }} className="text-xs text-blue-600 hover:underline">Tomorrow</button>
+                  <button type="button" onClick={() => {
+                    const d = new Date(); d.setDate(d.getDate() + (6 - d.getDay() + 7) % 7 || 7);
+                    setBookingModal({ ...bookingModal, date: d.toISOString().split('T')[0] })
+                  }} className="text-xs text-blue-600 hover:underline">Next Weekend</button>
+                </div>
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">Time</label>

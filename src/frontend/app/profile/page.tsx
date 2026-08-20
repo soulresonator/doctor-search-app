@@ -12,6 +12,7 @@ interface UserProfile {
   phone_number: string;
   role: string;
   age: number;
+  avatar: string | null;
 }
 
 export default function ProfilePage() {
@@ -20,6 +21,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<Partial<UserProfile>>({});
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (!localStorage.getItem('access_token')) {
@@ -37,9 +39,18 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     try {
-      const { data } = await api.patch('/auth/me/', form);
+      const formData = new FormData();
+      if (form.full_name) formData.append('full_name', form.full_name);
+      if (form.phone_number) formData.append('phone_number', form.phone_number);
+      if (form.age) formData.append('age', form.age.toString());
+      if (avatarFile) formData.append('avatar', avatarFile);
+
+      const { data } = await api.patch('/auth/me/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       setProfile(data);
       setEditing(false);
+      setAvatarFile(null);
       alert('Profile updated successfully!');
     } catch {
       alert('Failed to update profile.');
@@ -61,7 +72,7 @@ export default function ProfilePage() {
       </header>
       <main className="mx-auto max-w-2xl px-4 py-8">
         <div className="rounded-2xl bg-white p-6 shadow-sm">
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-6 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">Personal Info</h2>
             {!editing ? (
               <button onClick={() => setEditing(true)} className="text-sm font-semibold text-blue-600 hover:underline">
@@ -69,7 +80,7 @@ export default function ProfilePage() {
               </button>
             ) : (
               <div className="flex gap-2">
-                <button onClick={() => { setForm(profile); setEditing(false); }} className="text-sm font-semibold text-gray-500 hover:underline">
+                <button onClick={() => { setForm(profile); setAvatarFile(null); setEditing(false); }} className="text-sm font-semibold text-gray-500 hover:underline">
                   Cancel
                 </button>
                 <button onClick={handleSave} className="text-sm font-semibold text-blue-600 hover:underline">
@@ -78,6 +89,27 @@ export default function ProfilePage() {
               </div>
             )}
           </div>
+          
+          <div className="mb-6 flex items-center gap-6">
+            <div className="h-20 w-20 overflow-hidden rounded-full bg-gray-200">
+              {avatarFile ? (
+                <img src={URL.createObjectURL(avatarFile)} alt="Preview" className="h-full w-full object-cover" />
+              ) : profile.avatar ? (
+                <img src={profile.avatar} alt="Avatar" className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-gray-400">No Image</div>
+              )}
+            </div>
+            {editing && (
+              <input 
+                type="file" 
+                accept="image/*"
+                onChange={e => e.target.files && setAvatarFile(e.target.files[0])}
+                className="text-sm"
+              />
+            )}
+          </div>
+
           <div className="space-y-4">
             <div>
               <label className="text-xs text-gray-500">Username</label>
