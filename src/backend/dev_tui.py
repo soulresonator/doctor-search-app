@@ -10,9 +10,10 @@ def print_menu():
     print("1. Make Migrations")
     print("2. Migrate")
     print("3. Create Superuser")
-    print("4. Run Development Server")
-    print("5. Run Tests")
-    print("6. Run Tests (verbose)")
+    print("4. Seed Test Data (Creates a Doctor account)")
+    print("5. Run Development Server")
+    print("6. Run Tests")
+    print("7. Run Tests (verbose)")
     print("0. Exit")
     print("="*40)
 
@@ -44,11 +45,50 @@ def main():
         elif choice == "3":
             run_command("python manage.py createsuperuser")
         elif choice == "4":
+            print("\nGenerating seed data (creating test doctor)...")
+            script = """
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+django.setup()
+
+from apps.users.models import User
+from apps.doctors.models import Doctor, Specialty, Hospital
+
+specialty, _ = Specialty.objects.get_or_create(name='Cardiology', defaults={'description':'Heart specialist'})
+hospital, _ = Hospital.objects.get_or_create(name='General Hospital', defaults={'location':'New York'})
+
+user, created = User.objects.get_or_create(username='doctor_jane', defaults={
+    'full_name': 'Dr. Jane Smith',
+    'phone_number': '+1987654321',
+    'age': 45,
+    'gender': 'Female',
+    'occupation': 'Doctor',
+    'role': 'doctor'
+})
+if created:
+    user.set_password('securepass123')
+    user.save()
+
+doc, doc_created = Doctor.objects.get_or_create(user=user, defaults={
+    'full_name': 'Dr. Jane Smith',
+    'specialty': specialty,
+    'hospital': hospital,
+    'years_of_experience': 15,
+})
+
+print(f"\\n✅ Doctor account ready!\\nUsername: doctor_jane\\nPassword: securepass123")
+"""
+            with open('.seed.py', 'w') as f:
+                f.write(script.strip())
+            run_command("python .seed.py")
+            os.remove('.seed.py')
+        elif choice == "5":
             print("\nPress Ctrl+C to stop the server.")
             run_command("python manage.py runserver", wait=False)
-        elif choice == "5":
-            run_command("pytest")
         elif choice == "6":
+            run_command("pytest")
+        elif choice == "7":
             run_command("pytest -v")
         elif choice == "0":
             print("\nGoodbye! 👋")
