@@ -2,10 +2,10 @@
 DJANGO_SETTINGS_MODULE = "config.settings"
 pythonpath = ["src/backend"]
 env = [
-    "SECRET_KEY=test-secret-key-not-for-production",
-    "DB_NAME=doctorapp_test",
-    "DB_USER=nhat",
-    "DB_PASSWORD=",
-    "DB_HOST=localhost",
-    "DB_PORT=5432",
+    "D:SECRET_KEY=test-secret-key-not-for-production",
+    "D:DB_NAME=doctorapp_test",
+    "D:DB_USER=nhat",
+    "D:DB_PASSWORD=",
+    "D:DB_HOST=localhost",
+    "D:DB_PORT=5432",
 ]
