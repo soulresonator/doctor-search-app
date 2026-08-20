@@ -84,12 +84,6 @@ export default function ProfilePage() {
               <p className="font-semibold text-gray-900">{profile.username}</p>
             </div>
             <div>
-              <label className="text-xs text-gray-500">Role</label>
-              <p className="mt-1 inline-block rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800">
-                {profile.role.toUpperCase()}
-              </p>
-            </div>
-            <div>
               <label className="text-xs text-gray-500">Full Name</label>
               {editing ? (
                 <input type="text" value={form.full_name || ''} onChange={e => setForm({...form, full_name: e.target.value})} className="mt-1 block w-full rounded border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />

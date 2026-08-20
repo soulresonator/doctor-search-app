@@ -10,7 +10,7 @@ def print_menu():
     print("1. Make Migrations")
     print("2. Migrate")
     print("3. Create Superuser")
-    print("4. Seed Test Data (Creates a Doctor account)")
+    print("4. Seed Test Data (Creates a Doctor)")
     print("5. Run Development Server")
     print("6. Run Tests")
     print("7. Run Tests (verbose)")
@@ -58,26 +58,13 @@ from apps.doctors.models import Doctor, Specialty, Hospital
 specialty, _ = Specialty.objects.get_or_create(name='Cardiology', defaults={'description':'Heart specialist'})
 hospital, _ = Hospital.objects.get_or_create(name='General Hospital', defaults={'location':'New York'})
 
-user, created = User.objects.get_or_create(username='doctor_jane', defaults={
-    'full_name': 'Dr. Jane Smith',
-    'phone_number': '+1987654321',
-    'age': 45,
-    'gender': 'Female',
-    'occupation': 'Doctor',
-    'role': 'doctor'
-})
-if created:
-    user.set_password('securepass123')
-    user.save()
-
-doc, doc_created = Doctor.objects.get_or_create(user=user, defaults={
-    'full_name': 'Dr. Jane Smith',
+doc, doc_created = Doctor.objects.get_or_create(full_name='Dr. Jane Smith', defaults={
     'specialty': specialty,
     'hospital': hospital,
     'years_of_experience': 15,
 })
 
-print(f"\\n✅ Doctor account ready!\\nUsername: doctor_jane\\nPassword: securepass123")
+print(f"\\n✅ Doctor entity ready!")
 """
             with open('.seed.py', 'w') as f:
                 f.write(script.strip())

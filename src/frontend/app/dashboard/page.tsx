@@ -99,17 +99,6 @@ export default function DashboardPage() {
     }
   };
 
-  const [userRole, setUserRole] = useState<string>('');
-
-  const fetchUser = async () => {
-    try {
-      const { data } = await api.get('/auth/me/');
-      setUserRole(data.role);
-    } catch {
-      console.error('Failed to load user');
-    }
-  };
-
   const updateStatus = async (apptId: string, newStatus: string) => {
     if (!window.confirm(`Are you sure you want to mark this as ${newStatus}?`)) return;
     try {
@@ -125,7 +114,6 @@ export default function DashboardPage() {
       router.push('/login');
       return;
     }
-    fetchUser();
     fetchOptions();
     fetchDoctors(filters, 1);
     fetchAppointments();
@@ -237,7 +225,7 @@ export default function DashboardPage() {
                   className="cursor-pointer rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:border-blue-300"
                 >
                   <p className="font-semibold">
-                    {userRole === 'doctor' ? `Patient: ${appt.patient_name}` : `Doctor: ${appt.doctor_name}`}
+                    Doctor: {appt.doctor_name}
                   </p>
                   <p className="text-sm text-gray-600">
                     {new Date(appt.scheduled_at).toLocaleString()}
@@ -363,7 +351,6 @@ export default function DashboardPage() {
             <h2 className="mb-4 text-xl font-bold text-gray-900">Appointment Details</h2>
             <div className="space-y-3">
               <p><span className="font-medium text-gray-500">Doctor:</span> {apptModal.doctor_name}</p>
-              <p><span className="font-medium text-gray-500">Patient:</span> {apptModal.patient_name}</p>
               <p><span className="font-medium text-gray-500">Date/Time:</span> {new Date(apptModal.scheduled_at).toLocaleString()}</p>
               <p>
                 <span className="font-medium text-gray-500">Status:</span> 
@@ -382,22 +369,12 @@ export default function DashboardPage() {
                 Close
               </button>
               {apptModal.status === 'pending' && (
-                <>
-                  <button 
-                    onClick={() => { updateStatus(apptModal.id, 'cancelled'); setApptModal(null); }}
-                    className="rounded-lg bg-red-100 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-200"
-                  >
-                    Cancel
-                  </button>
-                  {userRole === 'doctor' && (
-                    <button 
-                      onClick={() => { updateStatus(apptModal.id, 'confirmed'); setApptModal(null); }}
-                      className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
-                    >
-                      Confirm
-                    </button>
-                  )}
-                </>
+                <button 
+                  onClick={() => { updateStatus(apptModal.id, 'cancelled'); setApptModal(null); }}
+                  className="rounded-lg bg-red-100 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-200"
+                >
+                  Cancel Appointment
+                </button>
               )}
             </div>
           </div>

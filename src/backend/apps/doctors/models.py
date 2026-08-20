@@ -45,14 +45,6 @@ class ClinicAddress(models.Model):
 
 class Doctor(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    # Linked user account — set when a doctor registers/is invited
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='doctor_profile',
-    )
     full_name = models.CharField(max_length=255, db_index=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)

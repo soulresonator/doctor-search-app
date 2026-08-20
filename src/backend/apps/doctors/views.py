@@ -39,11 +39,7 @@ class AppointmentListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        user = self.request.user
-        # Doctors see appointments for their profile; patients see their own
-        if user.role == 'doctor' and hasattr(user, 'doctor_profile'):
-            return Appointment.objects.filter(doctor=user.doctor_profile).select_related('patient', 'doctor')
-        return Appointment.objects.filter(patient=user).select_related('patient', 'doctor')
+        return Appointment.objects.filter(patient=self.request.user).select_related('patient', 'doctor')
 
 
 class DoctorOptionsView(generics.GenericAPIView):
@@ -59,29 +55,20 @@ class DoctorOptionsView(generics.GenericAPIView):
 
 
 class AppointmentStatusView(generics.UpdateAPIView):
-    """Doctor confirms/cancels, patient can only cancel."""
+    """Patient can only cancel."""
     serializer_class = AppointmentStatusSerializer
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ['patch']
 
     def get_queryset(self):
-        user = self.request.user
-        if user.role == 'doctor' and hasattr(user, 'doctor_profile'):
-            return Appointment.objects.filter(doctor=user.doctor_profile)
-        return Appointment.objects.filter(patient=user)
+        return Appointment.objects.filter(patient=self.request.user)
 
     def patch(self, request, *args, **kwargs):
         appt = self.get_object()
         new_status = request.data.get('status')
-        user = request.user
-        
-        is_doctor = user.role == 'doctor' and hasattr(user, 'doctor_profile') and appt.doctor == user.doctor_profile
-        is_patient = appt.patient == user
 
         if new_status == Appointment.STATUS_CANCELLED:
-            pass # Both can cancel
-        elif new_status == Appointment.STATUS_CONFIRMED and is_doctor:
-            pass # Only doctor can confirm
+            pass # Patient can cancel
         else:
             return Response({'detail': 'Invalid status or permission denied.'}, status=status.HTTP_403_FORBIDDEN)
 
