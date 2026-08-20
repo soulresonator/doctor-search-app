@@ -7,8 +7,8 @@ import api from '@/lib/api';
 
 const FIELDS = [
   { name: 'username', label: 'Username', type: 'text', minLength: 3 },
-  { name: 'password', label: 'Password', type: 'password', minLength: 6 },
-  { name: 'confirm_password', label: 'Confirm Password', type: 'password', minLength: 6 },
+  { name: 'password', label: 'Password', type: 'password', minLength: 8 },
+  { name: 'confirm_password', label: 'Confirm Password', type: 'password', minLength: 8 },
   { name: 'full_name', label: 'Full Name', type: 'text' },
   { name: 'phone_number', label: 'Phone Number', type: 'tel', pattern: '^\\+?[0-9]{7,15}$' },
   { name: 'age', label: 'Age', type: 'number', min: 1, max: 120 },
@@ -35,7 +35,7 @@ export default function RegisterPage() {
     if (!touched[name]) return null;
     const v = form[name];
     if (!v) return 'Required';
-    if (name === 'password' && v.length < 6) return 'Min 6 chars';
+    if (name === 'password' && v.length < 8) return 'Min 8 chars';
     if (name === 'confirm_password' && v !== form.password) return 'Passwords do not match';
     if (name === 'age' && (Number(v) < 1 || Number(v) > 120)) return 'Invalid age';
     if (name === 'phone_number' && !/^\+?[0-9]{7,15}$/.test(v)) return 'Invalid phone format';
@@ -66,9 +66,14 @@ export default function RegisterPage() {
       localStorage.setItem('access_token', data.access);
       localStorage.setItem('refresh_token', data.refresh);
       router.push('/dashboard');
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Registration failed. Please try again.';
-      setError(msg);
+    } catch (err: any) {
+      if (err.response?.data) {
+        const data = err.response.data;
+        const msgs = Object.entries(data).map(([k, v]) => `${k}: ${v}`);
+        setError(msgs.join(' | '));
+      } else {
+        setError(err.message || 'Registration failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
