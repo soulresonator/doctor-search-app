@@ -71,6 +71,34 @@ def test_register_password_not_in_response(client, register_payload):
     resp = client.post(url, register_payload, format='json')
     assert 'password' not in resp.data
 
+@pytest.mark.django_db
+def test_register_invalid_phone_number(client, register_payload):
+    url = reverse('auth-register')
+    register_payload['phone_number'] = 'abc'
+    resp = client.post(url, register_payload, format='json')
+    assert resp.status_code == 400
+
+@pytest.mark.django_db
+def test_register_age_out_of_bounds(client, register_payload):
+    url = reverse('auth-register')
+    register_payload['age'] = 150
+    resp = client.post(url, register_payload, format='json')
+    assert resp.status_code == 400
+
+@pytest.mark.django_db
+def test_register_age_negative(client, register_payload):
+    url = reverse('auth-register')
+    register_payload['age'] = -5
+    resp = client.post(url, register_payload, format='json')
+    assert resp.status_code == 400
+
+@pytest.mark.django_db
+def test_register_invalid_age_type(client, register_payload):
+    url = reverse('auth-register')
+    register_payload['age'] = 'not-a-number'
+    resp = client.post(url, register_payload, format='json')
+    assert resp.status_code == 400
+
 
 # ── Login ─────────────────────────────────────────────────────────────────────
 

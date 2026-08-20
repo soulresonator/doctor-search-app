@@ -22,6 +22,7 @@ interface Appointment {
   patient_name: string;
   scheduled_at: string;
   status: string;
+  note?: string;
 }
 
 export default function DashboardPage() {
@@ -79,6 +80,7 @@ export default function DashboardPage() {
   };
 
   const [bookingModal, setBookingModal] = useState<{ doctor: Doctor | null, date: string, time: string }>({ doctor: null, date: '', time: '09:00' });
+  const [apptModal, setApptModal] = useState<Appointment | null>(null);
 
   const bookAppointment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -229,7 +231,11 @@ export default function DashboardPage() {
           ) : (
             <div className="grid gap-4 sm:grid-cols-2">
               {appointments.map((appt) => (
-                <div key={appt.id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                <div 
+                  key={appt.id} 
+                  onClick={() => setApptModal(appt)}
+                  className="cursor-pointer rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:border-blue-300"
+                >
                   <p className="font-semibold">
                     {userRole === 'doctor' ? `Patient: ${appt.patient_name}` : `Doctor: ${appt.doctor_name}`}
                   </p>
@@ -239,25 +245,6 @@ export default function DashboardPage() {
                   <p className="mt-2 inline-block rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800">
                     {appt.status.toUpperCase()}
                   </p>
-                  
-                  {appt.status === 'pending' && (
-                    <div className="mt-3 flex gap-2">
-                      {userRole === 'doctor' && (
-                        <button 
-                          onClick={() => updateStatus(appt.id, 'confirmed')}
-                          className="text-xs font-semibold text-green-600 hover:underline"
-                        >
-                          Confirm
-                        </button>
-                      )}
-                      <button 
-                        onClick={() => updateStatus(appt.id, 'cancelled')}
-                        className="text-xs font-semibold text-red-600 hover:underline"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
@@ -365,6 +352,54 @@ export default function DashboardPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Appointment Details Modal */}
+      {apptModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <h2 className="mb-4 text-xl font-bold text-gray-900">Appointment Details</h2>
+            <div className="space-y-3">
+              <p><span className="font-medium text-gray-500">Doctor:</span> {apptModal.doctor_name}</p>
+              <p><span className="font-medium text-gray-500">Patient:</span> {apptModal.patient_name}</p>
+              <p><span className="font-medium text-gray-500">Date/Time:</span> {new Date(apptModal.scheduled_at).toLocaleString()}</p>
+              <p>
+                <span className="font-medium text-gray-500">Status:</span> 
+                <span className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-800">{apptModal.status.toUpperCase()}</span>
+              </p>
+              {apptModal.note && (
+                <p><span className="font-medium text-gray-500">Note:</span> {apptModal.note}</p>
+              )}
+            </div>
+
+            <div className="mt-8 flex justify-end gap-3">
+              <button
+                onClick={() => setApptModal(null)}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+              >
+                Close
+              </button>
+              {apptModal.status === 'pending' && (
+                <>
+                  <button 
+                    onClick={() => { updateStatus(apptModal.id, 'cancelled'); setApptModal(null); }}
+                    className="rounded-lg bg-red-100 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-200"
+                  >
+                    Cancel
+                  </button>
+                  {userRole === 'doctor' && (
+                    <button 
+                      onClick={() => { updateStatus(apptModal.id, 'confirmed'); setApptModal(null); }}
+                      className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
+                    >
+                      Confirm
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}
